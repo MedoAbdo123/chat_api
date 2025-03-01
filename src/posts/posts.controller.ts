@@ -29,4 +29,9 @@ export class PostsController {
   async getPostsById(@Param('userId') userId: string){
     return this.postsService.getPostsById(userId)
   }
+
+  @Get("getPosts")
+  async getAllPosts(){
+    return await this.postsService.getAllPosts()  
+  }
 }

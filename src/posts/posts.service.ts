@@ -40,5 +40,9 @@ export class PostsService {
     async getPostsById(userId: string) {
         if(!Types.ObjectId.isValid(userId)) throw new UnauthorizedException("Post Not Found!")
         return this.PostModel.find({userId})
-    }  
+    }
+
+    async getAllPosts() {
+        return await this.PostModel.find()
+    } 
 }

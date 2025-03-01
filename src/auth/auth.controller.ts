@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('register')
   async RegisterUsers(@Body() userDto: UserDto) {
@@ -14,7 +14,7 @@ export class AuthController {
   }
 
   @Post('login')
-  async LoginUser(@Body() userDto: UserDto){
+  async LoginUser(@Body() userDto: UserDto) {
     return this.authService.LoginUser(userDto)
   }
 
@@ -25,11 +25,11 @@ export class AuthController {
   ) {
     const isValid = mongoose.Types.ObjectId.isValid(userId);
     if (!isValid) throw new UnauthorizedException('Invalid Id');
-    return this.authService.updateUser(updateUserDto,userId);
+    return this.authService.updateUser(updateUserDto, userId);
   }
-  
+
   @Get('search/:username')
-  async getUsers(@Param('username') username: string){
+  async getUsers(@Param('username') username: string) {
     return this.authService.findUsersByUsername(username)
   }
 }

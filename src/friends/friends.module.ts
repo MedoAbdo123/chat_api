@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { FriendRequest, FriendRequestSchema } from './schema/friend-request.schema';
 import { User, UserSchema } from 'src/auth/schema/user.schema';
 import { Chat, ChatSchema } from './schema/chate.schema';
+import { FriendsGateway } from './friend.gateway';
 
 @Module({
   imports: [MongooseModule.forFeature([
@@ -22,6 +23,7 @@ import { Chat, ChatSchema } from './schema/chate.schema';
     }
   ])],
   controllers: [FriendsController],
-  providers: [FriendsService],
+  providers: [FriendsService,FriendsGateway],
 })
+
 export class FriendsModule {}

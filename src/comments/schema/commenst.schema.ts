@@ -20,26 +20,3 @@ export class Comments {
 }
 
 export const CommentsSchema = SchemaFactory.createForClass(Comments)
-
-/**
- * @Schema()
-export class Comment {
-    @Prop({ required: true })
-    text: string;
-
-    @Prop({ type: Types.ObjectId, ref: 'User' })
-    userId: Types.ObjectId;
-
-    @Prop()
-    username: string;
-
-    @Prop()
-    email: string;
-
-    @Prop()
-    profile: string;
-}
-
-export const CommentSchema = SchemaFactory.createForClass(Comment);
-
- */
