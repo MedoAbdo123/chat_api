@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schema/user.schema';
 import { Model, Types } from 'mongoose';
-import { UserDto } from './dto/User.dto'; 
+import { UserDto } from './dto/User.dto';
 import * as bcrypt from "bcrypt"
 import { JwtService } from '@nestjs/jwt';
 import { updateUserDto } from './dto/UpdateUser.dto';
@@ -13,42 +13,42 @@ export class AuthService {
     constructor(
         @InjectModel(User.name) private userModel: Model<User>,
         private jwtService: JwtService
-    ){}
+    ) { }
 
     async RegisterUsers(userDto: UserDto) {
-        const {username, email, password, profile} = userDto
+        const { username, email, password, profile } = userDto;
 
-        const user = await this.userModel.findOne({email})
-        if(user) throw new UnauthorizedException("This email already exists")
+        const userExists = await this.userModel.findOne({ email });
+        if (userExists) throw new UnauthorizedException("This email already exists");
 
-        const hashPasseord = await bcrypt.hash(password, 10)
-        
+        const hashPassword = await bcrypt.hash(password, 10);
+        const baseUrl = 'http://localhost:3000/uploads/';
         const newUser = new this.userModel({
             username,
             email,
-            password: hashPasseord,
-            profile,
+            password: hashPassword,
+            profile: baseUrl + profile,
         });
+
         await newUser.save();
-        
-        const token = await this.jwtService.sign({
+
+        const token = this.jwtService.sign({
             id: newUser._id,
-            email: email, 
-            username: username, 
-            profile: profile
-        })
+            email: email,
+            username: username,
+            profile: baseUrl + profile,
+        });
+
         return {
-            date: {
-                newUser
-            },
-            token
-        }
-          
+            user: newUser,
+            token,
+        };
     }
+
 
     async LoginUser(loginDto: LoginUserDto) {
         const { email, password } = loginDto;
-    
+
         const user = await this.userModel.findOne({ email });
         if (!user) {
             throw new UnauthorizedException("Error email or password");
@@ -58,37 +58,49 @@ export class AuthService {
         if (!isPasswordValid) {
             throw new UnauthorizedException("Error email or password");
         }
-    
-        const token = this.jwtService.sign({ 
+
+        const token = this.jwtService.sign({
             id: user._id,
             username: user.username,
-            email: user.email, 
+            email: user.email,
             profile: user.profile
         });
-    
+
+
         return {
             user: {
                 id: user._id,
                 username: user.username,
                 email: user.email,
+                profile: user.profile
             },
             token,
         };
     }
+
+    async updateUser(updateUserDto: updateUserDto, userId: string) {
+        const baseUrl = 'http://localhost:3000/uploads/';
     
-    async updateUser(updateUserDto: updateUserDto, userId: string){
-        return this.userModel.findByIdAndUpdate(userId,updateUserDto,{new:true})
+        if (updateUserDto.profile) {
+            updateUserDto.profile = baseUrl + updateUserDto.profile;
+        }
+    
+        return this.userModel.findByIdAndUpdate(userId, updateUserDto, { new: true });
     }
 
     async findUsersByUsername(username: string) {
-      const users = await this.userModel.find({
-        username: { $regex: username, $options: 'i' } // 'i' لجعل البحث غير حساس لحالة الأحرف
-      });
-      
-      if (users.length === 0) {
-        throw new UnauthorizedException('No users found!');
-      }
-      
-      return users;
-    } 
+        const users = await this.userModel.find({
+            username: { $regex: username, $options: 'i' }
+        });
+
+        if (users.length === 0) {
+            throw new UnauthorizedException('No users found!');
+        }
+
+        return users;
+    }
+
+    async getAllUsers() {
+        return await this.userModel.find()
+    }  
 }

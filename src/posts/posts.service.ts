@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Post } from './schema/post.schema';
 import { CreatePostDto } from './dto/ceatePost.dto';
-import { User } from 'src/auth/schema/user.schema';
 import { UpadtePostDto } from './dto/updatePost.dto';
 
 @Injectable()
@@ -11,12 +10,14 @@ export class PostsService {
     constructor(@InjectModel(Post.name) private PostModel: Model<Post>){}
 
     async createPost(createPostDto: CreatePostDto, user: any) {
-        const { title, body } = createPostDto;
+        const { title, body, image } = createPostDto;
+        const baseUrl = 'http://localhost:3000/uploads/';
         const newPost = new this.PostModel({
             title,
             body,
             userId: user.id,
             username: user.username,
+            image: baseUrl + image,
             email: user.email,
             profile: user.profile,
         });

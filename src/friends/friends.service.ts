@@ -158,9 +158,9 @@ export class FriendsService {
       .populate({
         path: 'messages',
         populate: {
-          path: 'sender', // جلب بيانات المرسل لكل رسالة
+          path: 'sender',
           model: 'User',
-          select: 'username profile', // تحديد الحقول المطلوبة فقط
+          select: 'username profile',
         },
       })
       .exec();

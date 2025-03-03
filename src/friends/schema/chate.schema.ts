@@ -5,9 +5,7 @@ import { Document, Types } from "mongoose";
 class Message {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   sender: Types.ObjectId;
-
   
-
   @Prop({ type: String, required: true })
   message: string;
 
