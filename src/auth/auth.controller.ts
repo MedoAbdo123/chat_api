@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, UnauthorizedException, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UnauthorizedException,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserDto } from './dto/User.dto';
 import { updateUserDto } from './dto/UpdateUser.dto';
@@ -9,22 +18,27 @@ import { extname } from 'path';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
-
+  constructor(private readonly authService: AuthService) {}
   @Post('register')
   @UseInterceptors(
     FileInterceptor('profile', {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, file.fieldname + '-' + uniqueSuffix + extname(file.originalname));
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(
+            null,
+            file.fieldname + '-' + uniqueSuffix + extname(file.originalname),
+          );
         },
       }),
     }),
   )
-
-  async RegisterUsers(@Body() userDto: UserDto, @UploadedFile() file: Express.Multer.File) {
+  async RegisterUsers(
+    @Body() userDto: UserDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     if (file) {
       userDto.profile = file.filename;
     }
@@ -33,7 +47,7 @@ export class AuthController {
 
   @Post('login')
   async LoginUser(@Body() userDto: UserDto) {
-    return this.authService.LoginUser(userDto)
+    return this.authService.LoginUser(userDto);
   }
 
   @Post('update/:userId')
@@ -42,8 +56,12 @@ export class AuthController {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, file.fieldname + '-' + uniqueSuffix + extname(file.originalname));
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(
+            null,
+            file.fieldname + '-' + uniqueSuffix + extname(file.originalname),
+          );
         },
       }),
     }),
@@ -51,7 +69,7 @@ export class AuthController {
   async updateUser(
     @Body() updateUserDto: updateUserDto,
     @Param('userId') userId: string,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFile() file: Express.Multer.File,
   ) {
     if (file) {
       updateUserDto.profile = file.filename;
@@ -63,11 +81,11 @@ export class AuthController {
 
   @Get('search/:username')
   async getUsers(@Param('username') username: string) {
-    return this.authService.findUsersByUsername(username)
+    return this.authService.findUsersByUsername(username);
   }
 
   @Get('getAllUsers')
   async getAllUsers() {
-    return this.authService.getAllUsers()
+    return this.authService.getAllUsers();
   }
 }

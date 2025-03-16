@@ -11,7 +11,7 @@ import { FriendsModule } from './friends/friends.module';
     AuthModule,
     PostsModule,
     CommentsModule,
-    FriendsModule
+    FriendsModule,
   ],
   controllers: [],
   providers: [],
