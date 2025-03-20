@@ -42,9 +42,9 @@ export class AuthService {
         return {
             user: newUser,
             token,
+            message: "User has been registered successfully"
         };
     }
-
 
     async LoginUser(loginDto: LoginUserDto) {
         const { email, password } = loginDto;

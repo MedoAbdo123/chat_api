@@ -7,7 +7,7 @@ import { FriendsModule } from './friends/friends.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(process.env.MONGO_URL),
+    MongooseModule.forRoot('mongodb://127.0.0.1/CHATE_API'),
     AuthModule,
     PostsModule,
     CommentsModule,
