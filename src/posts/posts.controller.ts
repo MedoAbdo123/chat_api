@@ -50,4 +50,9 @@ export class PostsController {
   async getAllPosts() {
     return await this.postsService.getAllPosts();
   }
+
+  @Get("postId/:postId")
+  async getByPostId(@Param('postId') postId: string){
+    return await this.postsService.getByPostId(postId)
+  }
 }

@@ -84,8 +84,8 @@ export class AuthController {
     return this.authService.findUsersByUsername(username);
   }
 
-  @Get('getAllUsers')
-  async getAllUsers() {
-    return this.authService.getAllUsers();
+  @Get('getAllUsers/:userId')
+  async getAllUsers(@Param('userId') userId: string) {
+    return await this.authService.getAllUsers(userId);
   }
 }

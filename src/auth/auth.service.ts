@@ -80,12 +80,11 @@ export class AuthService {
 
     async updateUser(updateUserDto: updateUserDto, userId: string) {
         const baseUrl = 'http://localhost:3000/uploads/';
-    
+
         if (updateUserDto.profile) {
             updateUserDto.profile = baseUrl + updateUserDto.profile;
         }
-    
-        return this.userModel.findByIdAndUpdate(userId, updateUserDto, { new: true });
+        return this.userModel.findByIdAndUpdate(userId, updateUserDto, { new: false });
     }
 
     async findUsersByUsername(username: string) {
@@ -100,7 +99,7 @@ export class AuthService {
         return users;
     }
 
-    async getAllUsers() {
-        return await this.userModel.find()
-    }  
+    async getAllUsers(userId: string) {
+        return await this.userModel.find({ _id: { $ne: userId } });
+    }
 }

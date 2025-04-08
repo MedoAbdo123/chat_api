@@ -17,26 +17,56 @@ export class FriendsService {
   ) { }
 
   async sendRequest(friendRequestDto: FriendRequestDto, user: any) {
-    const { senderId, receiverId } = friendRequestDto
+    const { receiverId } = friendRequestDto;
 
     if (!receiverId) {
-      throw new BadRequestException("Missing receiverId")
+      throw new BadRequestException("Missing receiverId");
     }
 
+    if (user.id === receiverId) {
+      throw new BadRequestException("You cannot send a friend request to yourself.");
+    }
+
+    const existingRequest = await this.friendRequestModel.findOne({
+      senderId: user.id,
+      receiverId,
+    });
+
+    if (existingRequest) {
+      throw new BadRequestException("A friend request already exists between these users.");
+    }
 
     const sendRequest = await this.friendRequestModel.create({
       senderId: user.id,
       receiverId,
       username: user.username,
       email: user.email,
-      profile: user.profile
-    })
-    const existingRequest = await this.friendRequestModel.findOne({ senderId, receiverId })
-    if (existingRequest) {
-      throw new BadRequestException('A friend request already exists between these users.');
+      profile: user.profile,
+    });
+
+    return sendRequest;
+  }
+
+
+  async cancelRequest(friendRequestDto: FriendRequestDto, user: any) {
+    const { receiverId } = friendRequestDto;
+
+    if (!receiverId) {
+      throw new BadRequestException("Missing receiverId");
     }
 
-    return sendRequest
+    const existingRequest = await this.friendRequestModel.findOne({
+      senderId: user.id,
+      receiverId
+    });
+
+    if (!existingRequest) {
+      throw new BadRequestException("No friend request found to cancel.");
+    }
+
+    await this.friendRequestModel.deleteOne({ senderId: user.id, receiverId });
+
+    return { message: "Friend request canceled successfully." };
   }
 
   async acceptFriendRequest(requestId: string) {
@@ -69,15 +99,22 @@ export class FriendsService {
     }
   }
 
-
   async declineRequest(requestId: string) {
+    if (!Types.ObjectId.isValid(requestId)) {
+      throw new BadRequestException('Invalid request ID');
+    }
+
     const request = await this.friendRequestModel.findById(requestId);
     if (!request) throw new NotFoundException('Friend request not found');
 
     request.status = 'declined';
-    request.save();
-    return request.deleteOne()
+    await request.save();
+
+    await request.deleteOne();
+
+    return { message: "Friend request declined", status: "declined" };
   }
+
 
   async getRequests(userId: string) {
     return await this.friendRequestModel.find({ receiverId: userId })
@@ -127,7 +164,7 @@ export class FriendsService {
   }
 
   async sendMessage(chatDto: ChatDto, user: any) {
-    const { chatId, senderId, message } = chatDto;
+    const { chatId, message } = chatDto;
     const chatObjectId = new Types.ObjectId(chatId);
 
     const chat = await this.chatModel.findById(chatObjectId)
@@ -170,5 +207,15 @@ export class FriendsService {
     }
 
     return chat.messages;
+  }
+
+  async checkFriendRequest(senderId: string, receiverId: string) {
+    const request = await this.friendRequestModel.findOne({
+      senderId,
+      receiverId,
+    });
+
+    if (!request) return { status: 'none' };
+    return { status: request.status }; // pending / accepted / declined
   }
 }

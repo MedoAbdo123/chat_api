@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, Request, UseGuards } from '@nestjs/common';
 import { FriendsService } from './friends.service';
 import { FriendRequestDto } from './dto/FriendRequst.dto';
 import { FriendGuard } from './guard/friend.guard';
@@ -45,4 +45,19 @@ export class FriendsController {
   async getMessages(@Param('chatId') chatId: string) {
     return this.friendsService.getMessages(chatId);
   }
+
+  @Delete('cancel')
+  @UseGuards(FriendGuard)
+  async cancelRequest(@Body() friendRequestDto: FriendRequestDto, @Req() req: any) {
+    return this.friendsService.cancelRequest(friendRequestDto, req.user);
+  }
+
+  @Get('check/:userId')
+  @UseGuards(FriendGuard)
+  async checkStatus(@Param('userId') userId: string, @Request() req) {
+    const myId = req.user.userId;
+    const status = await this.friendsService.checkFriendRequest(myId, userId);
+    return { status }; // ممكن يكون "pending", "accepted", أو "none"
+  }
+
 }
